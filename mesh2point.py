@@ -2,9 +2,9 @@ import trimesh
 import laspy
 import matplotlib.pyplot as plt
 
-def mesh_to_point_cloud(mesh_path, num_points=10000):
+def mesh_to_point_cloud(mesh_path, num_points=1024):
     # Load the mesh
-    mesh = trimesh.load(mesh_path)
+    mesh = trimesh.load(mesh_path, force='mesh')
 
     # Sample points on the surface of the mesh
     points, _ = trimesh.sample.sample_surface(mesh, num_points)
@@ -46,14 +46,15 @@ def write_las_file(point_cloud, las_file_path):
     #outfile.close()
 # if __name__ == "__main__":
 # Path to the OBJ file
-obj_file_path = "cube.obj"
+# obj_file_path = "cube.obj"
     
-# Number of points to sample on the surface of the mesh
-num_points = 10000
+# # Number of points to sample on the surface of the mesh
+# num_points = 1000
 
-# Convert mesh to point cloud
-point_cloud = mesh_to_point_cloud(obj_file_path, num_points)
-display_point_cloud(point_cloud)
+# # Convert mesh to point cloud
+# point_cloud = mesh_to_point_cloud(obj_file_path, num_points)
+# print(point_cloud)
+# display_point_cloud(point_cloud)
 # Path to save the LAS file
 # las_file_path = "/home/flavio/Documenti/University/output_point_cloud.las"
 
