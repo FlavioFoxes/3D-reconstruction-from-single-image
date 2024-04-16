@@ -1,5 +1,4 @@
 import trimesh
-import laspy
 import matplotlib.pyplot as plt
 
 def mesh_to_point_cloud(mesh_path, num_points=1024):
