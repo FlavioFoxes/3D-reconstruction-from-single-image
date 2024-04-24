@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
-# ShapeNetCore Dataser
+# ShapeNetCore Dataset
 class ObjectsPointCloudDataset(Dataset):
     """Shape net core dataset."""
 
