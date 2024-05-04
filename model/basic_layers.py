@@ -30,19 +30,15 @@ class ResidualBlock(nn.Module):
 # TODO: prova a runnare il codice man mano, stampando le dimensioni che escono dai 
 #       layer in modo da indovinarli qui
 
-class DownsamplingBlock(nn.Module):
-    def __init__(self):
-        super(self).__init__()
 
-
-class DownsamplingBlock(nn.Module):
-    def __init__(self, input_channels, shap):
-        super(self).__init__()
-        self.maxPool = nn.MaxPool2d(kernel_size=2, stride=2, padding='same')
-        self.res = ResidualBlock()
-class UpsamplingBlock(nn.Module):
-    def __init__(self):
-        super(self).__init__()
+# class DownsamplingBlock(nn.Module):
+#     def __init__(self, input_channels, shap):
+#         super(self).__init__()
+#         self.maxPool = nn.MaxPool2d(kernel_size=2, stride=2, padding='same')
+#         self.res = ResidualBlock()
+# class UpsamplingBlock(nn.Module):
+#     def __init__(self):
+#         super(self).__init__()
 
 
 class AttentionModule(nn.Module):
@@ -60,12 +56,15 @@ class AttentionModule(nn.Module):
         self.res3 = ResidualBlock(input_channels = output_channels, output_channels=output_channels)
 
         self.res4 = ResidualBlock(input_channels = output_channels, output_channels=output_channels)
-        self.up1 = nn.Upsample(size=(56, 56))
+        # self.up1 = nn.Upsample(size=(56, 56))   # this is defined inside the forward function to guarantee 
+                                                  # the right size for the upsampling
 
         self.res5 = ResidualBlock(input_channels=output_channels, output_channels=output_channels)
-        self.up2 = nn.Upsample(size=(112,112))
+        # self.up2 = nn.Upsample(size=(112,112))  # this is defined inside the forward function to guarantee 
+                                                  # the right size for the upsampling
 
-        self.conv = nn.Conv2d(in_channels=output_channels, out_channels=output_channels, kernel_size=1)
+        self.conv1 = nn.Conv2d(in_channels=output_channels, out_channels=output_channels, kernel_size=1)
+        self.conv2 = nn.Conv2d(in_channels=output_channels, out_channels=output_channels, kernel_size=1)
 
         # TRUNK branch
         self.res1_trunk = ResidualBlock(input_channels = output_channels, output_channels=output_channels)
@@ -74,6 +73,8 @@ class AttentionModule(nn.Module):
         self.res_final = ResidualBlock(input_channels = output_channels, output_channels=output_channels)
 
     def forward(self, x):
+        up2_shape = x.shape
+
         x = self.res1(x)
 
         # TRUNK branch
@@ -81,20 +82,30 @@ class AttentionModule(nn.Module):
         trunk_x = self.res2_trunk(x)
 
         # SOFT MASK branch
+        ## Downsampling
         x = self.max1(x)
         x = self.res2(x)
         ## Here skip has shape [1, 32, 56, 56]
         skip = self.skip(x)
+        up1_shape = skip.shape
+
         x = self.max2(x)
         x = self.res3(x)
         ## Here the x has shape [1, 32, 28, 28]
+        
+        ## Upsampling
         x = self.res4(x)
-        x = self.up1(x)
+        up1 = nn.Upsample(size=(up1_shape[2], up1_shape[3]))
+        x = up1(x)
+
         x = x + skip
+
         x = self.res5(x)
-        x = self.up2(x)
-        x = self.conv(x)
-        x = self.conv(x)
+        up2 = nn.Upsample(size=(up2_shape[2], up2_shape[3]))
+        x = up2(x)
+        
+        x = self.conv1(x)
+        x = self.conv2(x)
         x = F.sigmoid(x)
 
         # Union of the two branches
@@ -105,6 +116,8 @@ class AttentionModule(nn.Module):
         return x
 
 
-        
+# m = AttentionModule(input_channels=128, output_channels=128)
+# input_tensor = torch.randn(1, 128, 55, 55)
+# output_tensor = m(input_tensor)
         
 
