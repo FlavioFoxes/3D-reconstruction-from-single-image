@@ -10,7 +10,7 @@ class Network(nn.Module):
 
         # Calculate padding dynamically for 'same' padding
         # # INPUT = [1, 4, 224, 224]
-        self.conv0 = nn.Conv2d(4, 8, kernel_size=3, stride=1, padding=5)
+        self.conv0 = nn.Conv2d(input_channels, 8, kernel_size=3, stride=1, padding=5)
         # # Here x has shape [1, 8, 232, 232]
         self.conv1 = nn.Conv2d(8, 16, kernel_size=3, stride=1, padding=5)
         # # Here x has shape [1, 16, 240, 240]

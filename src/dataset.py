@@ -2,8 +2,8 @@ import os
 import torch
 import pandas as pd
 import numpy as np
-from skimage import io, transform
 import matplotlib.pyplot as plt
+from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 
@@ -32,15 +32,18 @@ class ObjectsPointCloudDataset(Dataset):
 
         img_name = os.path.join(self.root_dir,
                                 self.df.iloc[idx, 0])
-        image = io.imread(img_name)
-        points = self.df.iloc[idx, 1:]
-        points = np.array([points], dtype=float).reshape(-1, 3)
-        sample = {'image': image, 'points': points}
-
+        # image = io.imread(img_name)
+        image = Image.open(img_name).convert('RGBA')
         if self.transform:
-            sample = self.transform(sample)
+            image = self.transform(image)
+        points = self.df.iloc[idx, 1:].values
+        points = points.astype('float32')
+        # points = points.reshape(-1, 3) 
+        points = np.array([points], dtype=float).reshape(-1, 3)
+        # sample = {'image': image, 'points': points}
 
-        return sample
+
+        return image, points
 
 # df = pd.read_csv('/home/flavio/Scrivania/dataset.csv')
 # dataset = ObjectsPointCloudDataset(df=df,
