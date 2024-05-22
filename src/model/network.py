@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from basic_layers import ResidualBlock, AttentionModule
+from .basic_layers import ResidualBlock, AttentionModule
 
 class Network(nn.Module):
     def __init__(self, input_channels):
@@ -133,6 +133,6 @@ class Network(nn.Module):
 
 
 
-model = Network(4)
-input_tensor = torch.randn(1, 4, 224, 224)  # Example input tensor with batch size 16 and image size 224x224
-output_tensor = model(input_tensor)
+# model = Network(4)
+# input_tensor = torch.randn(1, 4, 224, 224)  # Example input tensor with batch size 16 and image size 224x224
+# output_tensor = model(input_tensor)
