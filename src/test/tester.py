@@ -1,21 +1,20 @@
 import sys
-sys.path.append('/home/flavio/Scrivania/3D-reconstruction-from-single-image/')
+sys.path.append('../')
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 
 from src.utils.utils import *
-from dataset.dataset import ObjectsPointCloudDataset
+from src.dataset.dataset import ObjectsPointCloudDataset
 from src.model.network import Network
 from src.train.loss import SumOfDistancesLoss
 from src.test.evaluate import evaluate
 
 
 
-if __name__ == "__main__":
-
+def tester():
     # Load all configuration information
     config = load_config("config.yaml")
 
@@ -32,7 +31,7 @@ if __name__ == "__main__":
     ])
 
     # Logger for debugging
-    writer = SummaryWriter()
+    writer = SummaryWriter(log_dir=config['logs_path'])
 
 
     # Create test dataset objects

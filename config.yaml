@@ -10,7 +10,11 @@ save_model: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_
 # Path from where we want to load an already trained model (probably is the same of save_path)
 load_model: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_models/model_state_twoClasses.pth'
 
+# Path where we want to save our model after training
+save_model: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_models/model_state.pth'
 
+# Path where we want to save log files after training and testing
+logs_path: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/logs
 
 
 
