@@ -162,3 +162,7 @@ cython_debug/
 # not upload the dataset because it's too big
 *.csv
 .vscode
+
+*.pt
+*.pth
+trained_models/

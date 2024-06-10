@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import flatten
+from torch import flatten, sigmoid
+import torch.optim as optim
+
 
 class ResidualBlock(nn.Module):
     def __init__(self, input_channels, output_channels):
@@ -11,34 +13,22 @@ class ResidualBlock(nn.Module):
         self.batch2 = nn.BatchNorm2d(num_features=output_channels)
         self.conv2 = nn.Conv2d(in_channels=output_channels, out_channels=output_channels, kernel_size=3, padding='same')
         
+        self.conv_res = None
+        if input_channels != output_channels:
+            self.conv_res = nn.Conv2d(in_channels=input_channels, out_channels=output_channels, kernel_size=1)
         
-
     def forward(self, x):
         residual = x
         x = self.batch1(x)
-        x = F.relu(x)
+        x = F.leaky_relu(x)
         x = self.conv1(x)
         x = self.batch2(x)
-        x = F.relu(x)
+        x = F.leaky_relu(x)
         x = self.conv2(x)
-        if residual.shape[1] != x.shape[1]:
-            conv_res = nn.Conv2d(in_channels=residual.shape[1], out_channels=x.shape[1], kernel_size=1)
-            residual = conv_res(residual)
+        if self.conv_res is not None:
+            residual = self.conv_res(residual)
         x = x + residual
         return x
-
-# TODO: prova a runnare il codice man mano, stampando le dimensioni che escono dai 
-#       layer in modo da indovinarli qui
-
-
-# class DownsamplingBlock(nn.Module):
-#     def __init__(self, input_channels, shap):
-#         super(self).__init__()
-#         self.maxPool = nn.MaxPool2d(kernel_size=2, stride=2, padding='same')
-#         self.res = ResidualBlock()
-# class UpsamplingBlock(nn.Module):
-#     def __init__(self):
-#         super(self).__init__()
 
 
 class AttentionModule(nn.Module):
@@ -58,6 +48,9 @@ class AttentionModule(nn.Module):
         self.res4 = ResidualBlock(input_channels = output_channels, output_channels=output_channels)
         # self.up1 = nn.Upsample(size=(56, 56))   # this is defined inside the forward function to guarantee 
                                                   # the right size for the upsampling
+
+        self.up1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
+        self.up2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
 
         self.res5 = ResidualBlock(input_channels=output_channels, output_channels=output_channels)
         # self.up2 = nn.Upsample(size=(112,112))  # this is defined inside the forward function to guarantee 
@@ -79,7 +72,7 @@ class AttentionModule(nn.Module):
 
         # TRUNK branch
         trunk_x = self.res1_trunk(x)
-        trunk_x = self.res2_trunk(x)
+        trunk_x = self.res2_trunk(trunk_x)
 
         # SOFT MASK branch
         ## Downsampling
@@ -95,29 +88,80 @@ class AttentionModule(nn.Module):
         
         ## Upsampling
         x = self.res4(x)
-        up1 = nn.Upsample(size=(up1_shape[2], up1_shape[3]))
-        x = up1(x)
+        # self.up1 = nn.Upsample(size=(up1_shape[2], up1_shape[3]))
+        x = self.up1(x)
 
         x = x + skip
 
         x = self.res5(x)
-        up2 = nn.Upsample(size=(up2_shape[2], up2_shape[3]))
-        x = up2(x)
+        # self.up2 = nn.Upsample(size=(up2_shape[2], up2_shape[3]))
+        x = self.up2(x)
         
         x = self.conv1(x)
         x = self.conv2(x)
-        x = F.sigmoid(x)
+        x = sigmoid(x)
 
         # Union of the two branches
-        x = torch.matmul(x, trunk_x)
+        # x = torch.matmul(x, trunk_x)
+        x = x * trunk_x
         x = x + trunk_x
         x = self.res_final(x)
 
         return x
 
 
-# m = AttentionModule(input_channels=128, output_channels=128)
-# input_tensor = torch.randn(1, 128, 55, 55)
-# output_tensor = m(input_tensor)
-        
+if __name__ == "__main__":
+
+    # m = ResidualBlock(input_channels = 4, output_channels=8)
+    # input_tensor = torch.randn(1,4,10,10)
+    # target_tensor = torch.randn(1,8,8,8)
+
+
+    m = AttentionModule(input_channels=128, output_channels=128)
+    input_tensor = torch.randn(1, 128, 55, 55)
+    target_tensor = torch.randn(1, 128, 55, 55)
+    criterion  = nn.MSELoss()
+
+    optimizer = optim.Adam(m.parameters(), lr=0.01)
+
+    m.train()  # Set the model to training mode
+    # DEBUG
+    # for name, param in model.named_parameters():
+    #     print(f"{name}: {param.requires_grad}")
+    i = 0
+    # DEBUG
+    # Salva i pesi prima dell'ottimizzazione
+    before_update = {}
+    for name, param in m.named_parameters():
+        before_update[name] = param.clone().detach()
+
+    optimizer.zero_grad()  # Zero the parameter gradients
+
+    # DEBUG
+    # print("Images is on CUDA:", images.is_cuda)
+    # print("points is on CUDA:", point_clouds.is_cuda)
+    # check_model_device(model)
+
+    outputs = m(input_tensor)  # Forward pass
+
+    loss = criterion(outputs, target_tensor)  # Compute loss
+
+    loss.backward()  # Backward pass
+
+    # DEBUG
+    # Stampa dei gradienti per verificare che non siano nulli
+    # check_gradients(m)
+
+
+    optimizer.step()  # Optimize the model
+
+    # DEBUG
+    # Confronta i pesi prima e dopo l'ottimizzazione
+    # print_weight_updates(model, before_update)
+
+    # loss_list.append(float(loss))
+
+    print(f'---Running Loss: {float(loss):.4f}')  # Print running loss
+
+
 
