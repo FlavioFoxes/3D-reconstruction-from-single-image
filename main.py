@@ -2,6 +2,9 @@ import argparse
 
 from src.train.trainer import trainer
 from src.test.tester import tester
+from src.examples.plot_gt import plot_ground_truth
+from src.examples.plot_pred import plot_model_prediction
+
 
 def main():
     parser = argparse.ArgumentParser(description='Train or test the neural network')
@@ -11,7 +14,15 @@ def main():
                         action='store_true')
     
     parser.add_argument('--test',
-                        help='trains the network')
+                        help='trains the network',
+                        action='store_true')
+    
+    parser.add_argument('--ground', 
+                        help='Plot an example of ground truth',
+                        action='store_true')
+    parser.add_argument('--pred', 
+                        help='Plot an example of prediction',
+                        action='store_true')
 
     args = parser.parse_args()
 
@@ -22,7 +33,10 @@ def main():
         trainer()
     elif args.test:
         tester()
-
+    elif args.ground:
+        plot_ground_truth(3610)
+    elif args.pred:
+        plot_model_prediction(3610)
     else:
         parser.error("Specify at least one argument: --train or --test.")
 

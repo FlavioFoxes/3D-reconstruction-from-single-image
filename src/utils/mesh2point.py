@@ -1,5 +1,8 @@
 import trimesh
 import matplotlib.pyplot as plt
+import plotly.express as px
+import plotly.graph_objs as go
+
 def mesh_to_point_cloud(mesh_path, num_points=1024):
     # Load the mesh
     mesh = trimesh.load(mesh_path, force='mesh')
@@ -9,21 +12,21 @@ def mesh_to_point_cloud(mesh_path, num_points=1024):
 
     return points
 
-def display_point_cloud(point_cloud):
-    # Extract x, y, z coordinates
-    x = point_cloud[:, 0]
-    y = point_cloud[:, 1]
-    z = point_cloud[:, 2]
-
-    # Plot the point cloud
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, z, c='b', marker='.')
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.set_title('Point Cloud')
-    plt.show()
+def display_point_cloud(points):
+    
+    x = points[:, 0]
+    y = points[:, 1]
+    z = points[:, 2]
+    trace = go.Scatter3d(
+        x = x, y = y, z = z,mode = 'markers', marker = dict(
+            size = 7
+            # color = z, # set color to an array/list of desired values
+            # colorscale = 'Viridis'
+        )
+    )
+    layout = go.Layout(title = '3D Scatter plot')
+    fig = go.Figure(data = [trace], layout = layout)
+    fig.show()
 
 def write_las_file(point_cloud, las_file_path):
     # Create a new LAS file

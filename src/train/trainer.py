@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.init
 import torch.optim as optim
 from torch.utils.data import DataLoader
-# from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 
 from src.utils.utils import *
@@ -36,7 +36,7 @@ def init_weights(m):
 def trainer():
     # Load all configuration information
     config = load_config("config.yaml")
-    config_training = load_config("training.yaml")
+    config_training = load_config("src/train/training.yaml")
 
     # Unpack all training parameters
     lr = config_training["learning_rate"]

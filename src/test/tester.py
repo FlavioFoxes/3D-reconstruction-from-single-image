@@ -3,7 +3,7 @@ sys.path.append('../')
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
-# from torch.utils.tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
 
 from src.utils.utils import *
