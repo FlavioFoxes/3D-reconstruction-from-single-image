@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from torchvision import transforms
 from PIL import Image
+import plotly.graph_objs as go
+
 from src.model.network import Network
 from src.utils.mesh2point import display_point_cloud
 from src.utils.utils import load_config
@@ -41,7 +43,10 @@ def plot_model_prediction(idx):
         output = output.squeeze(0)
         # print(output)
         points = output.numpy()
-        display_point_cloud(points)
+        trace = display_point_cloud(points)
+        layout = go.Layout(title = f'Model Prediction - {idx}')
+        fig = go.Figure(data = [trace], layout = layout)
+        fig.show()
 
 if __name__ == "__main__":
     plot_model_prediction(3610)

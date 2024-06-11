@@ -29,14 +29,14 @@ def print_weight_updates(model, prev_params):
 
 
 def save_checkpoint(epoch, loss, model, optimizer):
-    PATH = "../../checkpoint.pt"
+    config = load_config("config.yaml")
 
     torch.save({
                 'epoch': epoch,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': loss,
-                }, PATH)
+                }, config['save_checkpoint'])
 
 def split_data(data):
     train_data, test_data = train_test_split(data, test_size=0.2, random_state=42)

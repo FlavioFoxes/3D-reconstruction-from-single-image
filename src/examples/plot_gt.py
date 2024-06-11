@@ -2,6 +2,7 @@ import sys
 sys.path.append('../')
 import pandas as pd
 import numpy as np
+import plotly.graph_objs as go
 from src.utils.mesh2point import display_point_cloud
 from src.utils.utils import load_config
 
@@ -25,7 +26,10 @@ def plot_ground_truth(idx):
 
     # Select the first row (index 0) for plotting
     points = data_array[0]
-    display_point_cloud(points)
+    trace = display_point_cloud(points)
+    layout = go.Layout(title = f'Ground Truth - {idx}')
+    fig = go.Figure(data = [trace], layout = layout)
+    fig.show()
 
 if __name__== "__main__":
     plot_ground_truth(3610)

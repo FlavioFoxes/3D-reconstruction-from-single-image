@@ -12,6 +12,7 @@ def mesh_to_point_cloud(mesh_path, num_points=1024):
 
     return points
 
+# Returns the trace of the figure. It must be added manually to the figure
 def display_point_cloud(points):
     
     x = points[:, 0]
@@ -24,9 +25,7 @@ def display_point_cloud(points):
             # colorscale = 'Viridis'
         )
     )
-    layout = go.Layout(title = '3D Scatter plot')
-    fig = go.Figure(data = [trace], layout = layout)
-    fig.show()
+    return trace
 
 def write_las_file(point_cloud, las_file_path):
     # Create a new LAS file
