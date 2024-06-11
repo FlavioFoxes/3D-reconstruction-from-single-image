@@ -4,23 +4,29 @@ import tqdm
 
 
 def evaluate(model, loader, criterion, device, testing=False, writer=None):
-    model.eval()  # Set the model to evaluation mode
+    # Set the model to evaluation mode
+    model.eval()
     loss_list = []
     i = 0
     with torch.no_grad():
         for images, point_clouds in tqdm.tqdm(loader):
+            # Move everything to device
             images = images.to(device)
             point_clouds = point_clouds.to(device)
 
-            outputs = model(images)  # Forward pass
+            # Inference
+            outputs = model(images)  
 
-            loss = criterion(outputs, point_clouds)  # Compute loss
+            # Compute loss
+            loss = criterion(outputs, point_clouds)
             loss_list.append(float(loss))
 
+            # If it is testing phase, write loss for each sample
             if(testing == True):
                 writer.add_scalar("Loss per sample - Test", loss, i)
 
             i += 1
 
-    eval_loss = sum(loss_list) / len(loss_list)  # Compute evaluation loss
+    # Average loss
+    eval_loss = sum(loss_list) / len(loss_list)
     return eval_loss

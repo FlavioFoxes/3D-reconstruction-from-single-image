@@ -21,7 +21,9 @@ def tester():
     # Load data from CSV
     column_names = ['Ignore'] + [f'Point_{i}_{axis}' for i in range(1024) for axis in ('x', 'y', 'z')]
     data = pd.read_csv(config['csv_path'], header=None, names=column_names)
-    
+    # Add a column that specifies the index in the original csv file of each sample
+    data['Index'] = data.index
+
     # Take test data
     _, _, test_data = split_data(data)
 
@@ -54,7 +56,13 @@ def tester():
     
     # Evaluate the model on Test set
     test_loss = evaluate(model, test_loader, criterion, device, testing=True, writer=writer)
-
     print(f"Loss - Test set:    {test_loss}")
+
+    # Print the indices of the testing sample
+    test_indices = test_data['Index'].tolist()
+    print("Test indices:")
+    print(test_indices)
+    print("These are the indices of the samples in the test set. ")
+    print("You can specify one of these indices to plot the ground truth and the prediction of the model.")
     writer.flush()
     writer.close()

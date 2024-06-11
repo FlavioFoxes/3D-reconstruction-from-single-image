@@ -19,11 +19,11 @@ from src.train.train import train
 
 def init_weights(m):
     if isinstance(m, nn.Conv2d):
-        nn.init.normal_(m.weight, mean=0.0, std=0.02)  # Inizializzazione gaussiana
+        nn.init.normal_(m.weight, mean=0.0, std=0.02)
         if m.bias is not None:
             nn.init.constant_(m.bias, 0)
     elif isinstance(m, nn.Linear):
-        nn.init.normal_(m.weight, mean=0.0, std=0.02)  # Inizializzazione gaussiana
+        nn.init.normal_(m.weight, mean=0.0, std=0.02)
         if m.bias is not None:
             nn.init.constant_(m.bias, 0)
     elif isinstance(m, nn.BatchNorm2d):
@@ -49,9 +49,10 @@ def trainer():
     # Load data from CSV
     column_names = ['Ignore'] + [f'Point_{i}_{axis}' for i in range(1024) for axis in ('x', 'y', 'z')]
     data = pd.read_csv(config['csv_path'], header=None, names=column_names)
-    # print(train_data)
-    # Split the data into train and test sets
-    # Split the test set into test and eval sets
+    # Add a column that specifies the index in teh original csv file of each sample
+    data['Index'] = data.index
+
+    # Split the data into train, eval, test datasets
     train_data, eval_data, test_data = split_data(data)
 
     # Trasform data into tensors
@@ -80,12 +81,13 @@ def trainer():
     model.apply(init_weights)
 
     # Define the loss function and optimizer
-    # criterion = nn.MSELoss(reduction='sum')  # Mean Squared Error loss
-    # criterion = nn.L1Loss()
     criterion  = SumOfDistancesLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
+    # Training
     total_loss = train(model, train_loader, eval_loader, optimizer, criterion, device, num_epochs, writer)
+
+    # Close writer and save the model
     writer.flush()
     writer.close()
     torch.save(model.state_dict(), config['save_model'])

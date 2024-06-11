@@ -44,12 +44,13 @@ def plot_example(idx):
     ])
     input_tensor = transform(image)
 
-    # # Add a batch dimension (as models expect a batch of images)
+    # Add a batch dimension (as models expect a batch of images)
     input_tensor = input_tensor.unsqueeze(0)
 
     model = Network(3)
     model.load_state_dict(torch.load(config["load_model"]))
-    model.eval()  # Set the model to evaluation mode
+    # Set the model to evaluation mode
+    model.eval()  
 
 
     # Model prediction points
@@ -63,11 +64,8 @@ def plot_example(idx):
 
 
     fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'surface'}, {'type': 'surface'}]], subplot_titles=["Ground Truth", "Model Prediction"])
-    # layout = go.Layout(title = f'Ground Truth vs Model Prediction - {idx}')
     fig.append_trace(trace_gt, row=1, col=1)
-
     fig.append_trace(trace_pred, row=1, col=2)
-
     fig.show()
 
 

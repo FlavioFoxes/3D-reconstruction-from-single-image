@@ -9,9 +9,9 @@ is_empty_directory() {
     fi
 }
 
-# Define the main folders
-shapes_folder="/home/flavio/Documenti/Datasets/ShapeNetCore_Complete"
-images_folder="/home/flavio/Documenti/Datasets/image"
+# Define the main folders with absolute paths
+shapes_folder="/home/flavio/Documenti/Datasets/Prova"
+images_folder="/home/flavio/Documenti/Datasets/im"
 
 
 # Check if the Shapes folder exists
@@ -29,7 +29,6 @@ fi
 # Iterate over the folders in the Images directory
 for dir in "$images_folder"/*; do
     if [ -d "$dir" ]; then
-        #echo "$dir"
         # Extract the directory name
         dir_name=$(basename "$dir")
         # Check if the corresponding directory exists in Shapes

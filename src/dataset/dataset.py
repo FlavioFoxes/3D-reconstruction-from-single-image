@@ -36,7 +36,7 @@ class ObjectsPointCloudDataset(Dataset):
         image = Image.open(img_name).convert('RGB')
         if self.transform:
             image = self.transform(image)
-        points = self.df.iloc[idx, 1:].values
+        points = self.df.iloc[idx, 1:-1].values
         # points = points.reshape(-1, 3) 
         points = np.array([points], dtype=np.float32).reshape(-1, 3)
         # sample = {'image': image, 'points': points}
