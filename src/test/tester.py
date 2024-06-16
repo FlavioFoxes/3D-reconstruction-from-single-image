@@ -13,7 +13,7 @@ from src.train.loss import SumOfDistancesLoss
 from src.test.evaluate import evaluate
 
 
-
+# It manages the test stage
 def tester():
     # Load all configuration information
     config = load_config("config.yaml")

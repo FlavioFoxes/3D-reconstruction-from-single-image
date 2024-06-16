@@ -8,69 +8,92 @@ import torch
 from src.test.evaluate import *
 
 
+"""
+Train function for one epoch:
+it trains the model on the loader for one epoch
 
+Arguments:
+        model:                      model to evaluate
+        train_loader (DataLoader):  DataLoader on which the model is trained
+        device:                     device on which everything sit
+        optimizer:                  optimization algorithm
+        criterion (Loss):           loss function
+        epoch:                      current epoch
+        writer (SummaryWriter):     it writes logs
+"""
 def trainOneEpoch(model, train_loader, device, optimizer, criterion, epoch, writer):
-    model.train()  # Set the model to training mode
-    # DEBUG
-    # for name, param in model.named_parameters():
-    #     print(f"{name}: {param.requires_grad}")
+    # Set the model to training mode
+    model.train()  
+
     loss_list = []
-    running_loss = 0.0
     i = 0
+
+    # For each sample in the train loader
     for images, point_clouds in tqdm.tqdm(train_loader):
-        # DEBUG
-        # Salva i pesi prima dell'ottimizzazione
-        # before_update = {}
-        # for name, param in model.named_parameters():
-        #     before_update[name] = param.clone().detach()
+        # Move everything to device
         images = images.to(device)
         point_clouds = point_clouds.to(device)
 
-        optimizer.zero_grad()  # Zero the parameter gradients
+        # Zero the parameter gradients
+        optimizer.zero_grad()  
 
-        # DEBUG
-        # print("Images is on CUDA:", images.is_cuda)
-        # print("points is on CUDA:", point_clouds.is_cuda)
-        # check_model_device(model)
+        # Forward pass
+        outputs = model(images) 
+        
+        # Compute loss
+        loss = criterion(outputs, point_clouds)
 
-        outputs = model(images)  # Forward pass
-        
-        loss = criterion(outputs, point_clouds)  # Compute loss
-        
-        # Mappa l'indice normalizzato sull'asse x di TensorBoard tra 0 e total_epochs
+        # Maps the normalized indexd on the x axis of TensorBoard between 0 and total_epochs
         writer_idx = (epoch + i / 4)
         writer.add_scalar("Loss per step - Train", loss, writer_idx)
-        loss.backward()  # Backward passepochs_no_improve
-        
-        # DEBUG
-        # Stampa dei gradienti per verificare che non siano nulli
-        # check_gradients(model)
 
+        # Bacward pass
+        loss.backward() 
 
-        optimizer.step()  # Optimize the model
+        # Optimization step
+        optimizer.step()  
 
-        # DEBUG
-        # Confronta i pesi prima e dopo l'ottimizzazione
-        # print_weight_updates(model, before_update)
-
+        # Append current loss to the list
         loss_list.append(float(loss))
         i += 1
         
-        print(f'---Running Loss: {float(loss):.4f}')  # Print running loss
+        # Print current loss
+        print(f'---Running Loss: {float(loss):.4f}')
 
-
-    epoch_loss = sum(loss_list) / len(loss_list)  # Compute epoch loss
+    # Compute epoch loss
+    epoch_loss = sum(loss_list) / len(loss_list) 
     return epoch_loss
 
+"""
+Train function:
+it manages training phase for every epoch
+
+Arguments:
+        model:                      model to evaluate
+        train_loader (DataLoader):  DataLoader on which the model is trained
+        eval_loader (DataLoader):   DataLoader on which the model is evaluated
+        optimizer:                  optimization algorithm
+        criterion (Loss):           loss function
+        device:                     device on which everything sit
+        num_epoch:                  total number of epochs
+        writer (SummaryWriter):     it writes logs
+        patience:                   Early stopping threshold
+"""
 def train(model, train_loader, eval_loader, optimizer, criterion, device, num_epochs, writer, patience=5):
     total_loss = 0.0
     best_eval_loss = float('inf')
     epochs_no_improve = 0
 
+    # For each epoch
     for epoch in tqdm.tqdm(range(num_epochs)):
+        # Set model in training mode
         model.train()
+
+        # Train for one epoch
         epoch_loss = trainOneEpoch(model, train_loader, device, optimizer, criterion, epoch, writer)
         writer.add_scalar("Loss per epoch - Train", epoch_loss, epoch)
+        
+        # Averaged loss until this epoch
         print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {epoch_loss:.4f}')
         total_loss += epoch_loss
 
@@ -83,6 +106,8 @@ def train(model, train_loader, eval_loader, optimizer, criterion, device, num_ep
         if eval_loss < best_eval_loss:
             best_eval_loss =  eval_loss
             epochs_no_improve = 0
+            # If this is the best model until this epoch,
+            # save a checkpoint
             save_checkpoint(epoch, total_loss, model, optimizer)
         else:
             epochs_no_improve += 1
@@ -90,7 +115,7 @@ def train(model, train_loader, eval_loader, optimizer, criterion, device, num_ep
                 print(f"Early stopping at epoch {epoch}")
                 break
 
-
+    # Average loss
     average_loss = total_loss / num_epochs
     return average_loss
 

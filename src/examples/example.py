@@ -12,7 +12,8 @@ from src.model.network import Network
 from src.utils.mesh2point import display_point_cloud
 from src.utils.utils import load_config
 
-
+# Given the index idx, for the sample idx-th it plots both
+# the Ground Truth (left) and the Prediction of the model(right) 
 def plot_example(idx):
 
     # Load all configuration information
@@ -38,6 +39,7 @@ def plot_example(idx):
     # Image for model prediction
     image_path = config['dataset_path']+path
     image = Image.open(image_path).convert('RGB')
+
     # Apply the transformations
     transform = transforms.Compose([
       transforms.ToTensor()
@@ -47,15 +49,14 @@ def plot_example(idx):
     # Add a batch dimension (as models expect a batch of images)
     input_tensor = input_tensor.unsqueeze(0)
 
+    # Load the model and set it to evaluation mode
     model = Network(3)
     model.load_state_dict(torch.load(config["load_model"]))
-    # Set the model to evaluation mode
     model.eval()  
 
 
     # Model prediction points
     with torch.no_grad():
-        # Pass the input tensor through the model to get predictions
         output = model(input_tensor)
         output = output.squeeze(0)
 
@@ -63,6 +64,7 @@ def plot_example(idx):
         trace_pred = display_point_cloud(points_pred)
 
 
+    # Make two plots: one for the ground truth, one for the prediction
     fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'surface'}, {'type': 'surface'}]], subplot_titles=["Ground Truth", "Model Prediction"])
     fig.append_trace(trace_gt, row=1, col=1)
     fig.append_trace(trace_pred, row=1, col=2)
