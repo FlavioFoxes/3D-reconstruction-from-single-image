@@ -3,23 +3,28 @@ import torch.nn as nn
 import torch.nn.functional as F
 from .basic_layers import ResidualBlock, AttentionModule
 
+"""
+Main network
+
+Argument:
+        input_channels: number of channels of the input (here RGB channels are considered, also RGBA can be considered)
+"""
 class Network(nn.Module):
     def __init__(self, input_channels):
         super(Network, self).__init__()
         # ENCODER
 
-        # Calculate padding dynamically for 'same' padding
-        # # INPUT = [1, 4, 224, 224]
+        # # INPUT = [B, 4, 224, 224]
         self.conv0 = nn.Conv2d(input_channels, 8, kernel_size=3, stride=1, padding=5)
-        # # Here x has shape [1, 8, 232, 232]
+        # # Here x has shape [B, 8, 232, 232]
         self.conv1 = nn.Conv2d(8, 16, kernel_size=3, stride=1, padding=5)
-        # # Here x has shape [1, 16, 240, 240]
+        # # Here x has shape [B, 16, 240, 240]
         self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=5)
-        # # Here x has shape [1, 32, 248, 248]
+        # # Here x has shape [B, 32, 248, 248]
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=5)
-        # # Here x has shape [1, 64, 256, 256]
+        # # Here x has shape [B, 64, 256, 256]
         self.conv4 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1)
-        # # Here x has shape [1, 64, 128, 128]
+        # # Here x has shape [B, 64, 128, 128]
         self.conv5 = nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1)
 
    
@@ -65,42 +70,39 @@ class Network(nn.Module):
         
         self.drop_final = nn.Dropout(p=0.6)
         self.linear1 = nn.Linear(in_features=1024*3, out_features= 1024*3)
-        # self.dropout = nn.Dropout(p=0.5)
-        # self.linear2 = nn.Linear(in_features=1024*3, out_features= 1024*3)
         
     def forward(self, x):
         # ENCODER
-        # x = self.padding1(x)  # Apply padding for conv1
         x = self.conv0(x)
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.conv5(x)
-        # # Here x has shape [1, 64, 128, 128]
+        # # Here x has shape [B, 64, 128, 128]
         
         x = self.attention1(x)
         x = self.res1(x)
         x = self.max1(x)
         x1 = x
-        # # # Here x has shape [1, 128, 64, 64]
+        # # # Here x has shape [B, 128, 64, 64]
 
         x = self.attention2(x)
         x = self.res2(x)
         x = self.max2(x)
         x2 = x
-        # # # Here x has shape [1, 256, 32, 32]
+        # # # Here x has shape [B, 256, 32, 32]
 
         x = self.attention3(x)
         x = self.res3(x)
         x = self.max3(x)
         x3 = x
-        # # # Here x has shape [1, 512, 16, 16]
+        # # # Here x has shape [B, 512, 16, 16]
 
         x = self.res4(x)
         x = self.res5(x)
         x = self.res6(x)
-        # # # Here x has shape [1, 512, 16, 16]
+        # # # Here x has shape [B, 512, 16, 16]
         # print("Final ENCODER shape:    ", x.shape)
         
 
@@ -112,7 +114,7 @@ class Network(nn.Module):
         x = self.deconv_d1(x)
         x3 = self.conv_x3(x3)
         x = F.leaky_relu(x + x3)
-        # # # Here x has shape [1, 256, 16, 16]
+        # # # Here x has shape [B, 256, 16, 16]
 
 
         x = self.conv_d2(x)
@@ -120,34 +122,23 @@ class Network(nn.Module):
         x = self.deconv_d2(x)
         x2 = self.conv_x2(x2)
         x = F.leaky_relu(x + x2)
-        # # # Here x has shape [1, 128, 32, 32]
+        # # # Here x has shape [B, 128, 32, 32]
 
         x = self.conv_d3(x)
         x = F.leaky_relu(x)
         x = self.deconv_d3(x)
         x1 = self.conv_x1(x1)
         x = F.leaky_relu(x + x1)
-        # # # Here x has shape [1, 64, 64, 64]
+        # # # Here x has shape [B, 64, 64, 64]
 
         x = self.conv_d4(x)
         x = F.leaky_relu(x)
         x = self.conv_final(x)
 
-        # [32, 3, 32, 32]
-        # x = x.view(1,-1)
+        # [B, 3, 32, 32]
         x = x.view(x.size(0), -1)
-        # x = self.drop_final(x)
         x = self.linear1(x)
-        # x = F.relu(x)
-        # x = self.dropout(x)
-        # x = self.linear2(x)
         x = x.view(-1, 1024, 3)
         # print("Final x shape:    ", x.shape)
         
         return x
-
-
-
-# model = Network(4)
-# input_tensor = torch.randn(32, 4, 224, 224)  # Example input tensor with batch size 16 and image size 224x224
-# output_tensor = model(input_tensor)

@@ -6,7 +6,8 @@ import numpy as np
 from src.utils.mesh2point import mesh_to_point_cloud
 from src.utils.utils import load_config
 
-
+# Create the csv file that will be used in DataLoaders
+# If a sample generates some errors, it is skipped
 def create_dataset(root_path, csv_path, list_images):
     with open(csv_path, 'w', newline='') as file:
         os.chdir(root_path)

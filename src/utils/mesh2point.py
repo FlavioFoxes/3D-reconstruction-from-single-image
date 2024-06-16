@@ -3,6 +3,15 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objs as go
 
+"""
+It samples points on the surface of the mesh.
+It generates the Ground Truth of out dataset.
+
+Arguments:
+        mesh_path (string):     path to the mesh
+        num_points:             number of points sampled on the surface
+                                of the mesh
+"""
 def mesh_to_point_cloud(mesh_path, num_points=1024):
     # Load the mesh
     mesh = trimesh.load(mesh_path, force='mesh')
@@ -11,8 +20,14 @@ def mesh_to_point_cloud(mesh_path, num_points=1024):
     points, _ = trimesh.sample.sample_surface(mesh, num_points)
 
     return points
+"""
+Returns the trace of the figure. 
+It must be added manually to the figure to be displayed
 
-# Returns the trace of the figure. It must be added manually to the figure
+Argument:
+        points:         points to be plotted
+
+"""
 def display_point_cloud(points):
     
     x = points[:, 0]

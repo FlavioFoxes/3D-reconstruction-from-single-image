@@ -11,7 +11,7 @@ from src.model.network import Network
 from src.utils.mesh2point import display_point_cloud
 from src.utils.utils import load_config
 
-
+# Given the index idx, for the sample idx-th it plots the Prediction of the model
 def plot_model_prediction(idx):
     # Load all configuration information
     config = load_config("config.yaml")
@@ -33,15 +33,16 @@ def plot_model_prediction(idx):
     # # Add a batch dimension (as models expect a batch of images)
     input_tensor = input_tensor.unsqueeze(0)
 
+    # Load the model and set it to evaluation mode
     model = Network(3)
     model.load_state_dict(torch.load(config["load_model"]))
-    model.eval()  # Set the model to evaluation mode
+    model.eval()  
 
+    # Model prediction points
     with torch.no_grad():
-        # Pass the input tensor through the model to get predictions
         output = model(input_tensor)
         output = output.squeeze(0)
-        # print(output)
+
         points = output.numpy()
         trace = display_point_cloud(points)
         layout = go.Layout(title = f'Model Prediction - {idx}')

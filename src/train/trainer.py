@@ -16,7 +16,12 @@ from src.train.loss import SumOfDistancesLoss
 from src.train.train import train
 
 
+"""
+Initializes the weights of the model.
 
+Argument:
+        m:      model
+"""
 def init_weights(m):
     if isinstance(m, nn.Conv2d):
         nn.init.normal_(m.weight, mean=0.0, std=0.02)
@@ -33,6 +38,13 @@ def init_weights(m):
         nn.init.constant_(m.weight, 1)
         nn.init.constant_(m.bias, 0)
 
+"""
+It manages the training stage.
+
+Argument:
+        isPretrained (bool):    True if we want to train a pretrained model, 
+                                False otherwise
+"""
 def trainer(isPretrained = False):
     # Load all configuration information
     config = load_config("config.yaml")

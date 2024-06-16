@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 from src.utils.mesh2point import display_point_cloud
 from src.utils.utils import load_config
 
-
+# Given the index idx, for the sample idx-th it plots the Ground Truth
 def plot_ground_truth(idx):
     # Load all configuration information
     config = load_config("config.yaml")
