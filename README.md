@@ -5,6 +5,7 @@ This repo contains a PyTorch implementation of the first part of the paper "Atte
 This project implements a neural network to generate the 3D point cloud of an object, starting just from one single image of it. The network is composed by an encoder based on an attention mechanism, and a decoder which maps extracted features into the final point cloud. The main structure of the network is shown below. \
 I have implemented and trained the network from scratch. The already trained model available here is trained on just two classes of objects, which are specified in the section Dataset.
 
+![alt text](https://github.com/FlavioFoxes/3D-reconstruction-from-single-image/blob/main/net.png)
 # Preliminary
 The file `config.yaml` contains all paths you have to specify in order to make the program running.
 
