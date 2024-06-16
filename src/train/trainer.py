@@ -33,7 +33,7 @@ def init_weights(m):
         nn.init.constant_(m.weight, 1)
         nn.init.constant_(m.bias, 0)
 
-def trainer():
+def trainer(isPretrained = False):
     # Load all configuration information
     config = load_config("config.yaml")
     config_training = load_config("src/train/training.yaml")
@@ -77,8 +77,12 @@ def trainer():
     # Initialize the model
     model = Network(input_channels=3)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    model = model.to(device)  # Move your model to GPU if available
-    model.apply(init_weights)
+    if isPretrained:
+        model.load_state_dict(torch.load(config['load_model']))
+        model = model.to(device)
+    else:
+        model = model.to(device)
+        model.apply(init_weights)
 
     # Define the loss function and optimizer
     criterion  = SumOfDistancesLoss()

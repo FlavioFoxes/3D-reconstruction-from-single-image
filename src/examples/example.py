@@ -70,4 +70,4 @@ def plot_example(idx):
 
 
 if __name__== "__main__":
-    plot_example(3610)
+    plot_example(44)

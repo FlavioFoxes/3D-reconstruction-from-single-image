@@ -13,6 +13,9 @@ def main():
     parser.add_argument('--train',
                         help='trains the network',
                         action='store_true')
+    parser.add_argument('--pretrain',
+                        help='trains a pretrained network',
+                        action='store_true')
     
     parser.add_argument('--test',
                         help='trains the network',
@@ -35,6 +38,8 @@ def main():
 
     if args.train:
         trainer()
+    elif args.pretrain:
+        trainer(isPretrained=True)
     elif args.test:
         tester()
     elif args.ground:
@@ -42,9 +47,9 @@ def main():
     elif args.pred:
         plot_model_prediction(3610)
     elif args.example:
-        plot_example(3610)
+        plot_example(4800)
     else:
-        parser.error("Specify at least one argument: --train or --test.")
+        parser.error("Specify at least one argument.")
 
 
 if __name__ == "__main__":
