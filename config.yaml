@@ -1,0 +1,17 @@
+# Path where csv file dataset is located
+csv_path: '/home/flavio/Scrivania/dataset_ordered_two_classes.csv'
+
+# Path where dataset folder is located (PS: finish the path with symbol "/")
+dataset_path: '/home/flavio/Documenti/Datasets/ShapeNetCore_TwoClasses/'
+
+# Path where we want to save our model after training
+save_model: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_models/tentativo_2Classes_pretrained.pth'
+
+# Path where we want to save checkpoints during training
+save_checkpoint: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_models/checkpoint_2Classes_pretrained.pth'
+
+# Path from where we want to load an already trained model (probably is the same of save_path)
+load_model: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/trained_models/model_state_twoClasses.pth'
+
+# Path where we want to save log files after training and testing
+logs_path: '/home/flavio/Scrivania/3D-reconstruction-from-single-image/logs/exp_2Classes_pretrained/'
