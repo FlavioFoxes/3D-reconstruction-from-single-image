@@ -23,13 +23,13 @@ def main():
     
     parser.add_argument('--ground', 
                         help='Plot an example of ground truth',
-                        action='store_true')
+                        type=int)
     parser.add_argument('--pred', 
                         help='Plot an example of prediction',
-                        action='store_true')
+                        type=int)
     parser.add_argument('--example', 
                         help='Plot an example of comparison between ground truth and model prediction',
-                        action='store_true')
+                        type=int)
 
     args = parser.parse_args()
 
@@ -42,12 +42,12 @@ def main():
         trainer(isPretrained=True)
     elif args.test:
         tester()
-    elif args.ground:
-        plot_ground_truth(3610)
-    elif args.pred:
-        plot_model_prediction(3610)
-    elif args.example:
-        plot_example(4800)
+    elif args.ground is not None:
+        plot_ground_truth(args.ground)
+    elif args.pred is not None:
+        plot_model_prediction(args.pred)
+    elif args.example is not None:
+        plot_example(args.example)
     else:
         parser.error("Specify at least one argument.")
 

@@ -15,7 +15,7 @@ from src.utils.utils import load_config
 # Given the index idx, for the sample idx-th it plots both
 # the Ground Truth (left) and the Prediction of the model(right) 
 def plot_example(idx):
-
+    
     # Load all configuration information
     config = load_config("config.yaml")
     # Load data from CSV
